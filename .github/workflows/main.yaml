@@ -1,0 +1,42 @@
+name: Build and Publish Docker Image
+
+# 1. The Trigger: This tells GitHub to run the pipeline every time you push code to the 'main' branch.
+on:
+  push:
+    branches: [ "main" ]
+
+# 2. The Environment Variables
+env:
+  REGISTRY: ghcr.io
+  # github.repository is automatically populated with "YourUsername/my-first-pipeline"
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest # This is the Runner. GitHub gives you an Ubuntu VM for free.
+    
+    # Give the runner permission to push to the GitHub Container Registry
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # Step A: Download the code from your repository onto the Ubuntu runner
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step B: Log in to the registry using the automatic secret token
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step C: Build the Dockerfile and push the image artifact to GHCR
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
