@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   # github.repository is automatically populated with "YourUsername/my-first-pipeline"
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ojasveer955/pipeline-practice
 
 jobs:
   build-and-push-image:
